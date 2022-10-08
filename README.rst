@@ -20,12 +20,14 @@ Build
 Build the ``releng`` profile as usual, with ``mkarchiso``:
 
 .. code:: sh
+
    sudo ./archiso/mkarchiso -v -w ./work/ -o ./build/ ./configs/releng
 
 Test with QEMU
 ==============
 
 .. code:: sh
+
    ./scripts/run_archiso.sh -d -s -u -i ./build/archlinux-2022.10.08-x86_64.iso
 
 =======
