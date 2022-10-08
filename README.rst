@@ -1,3 +1,33 @@
+===============
+About this fork
+===============
+
+The purpose of this fork is to allow building a secureboot-compatible archiso. This is achieved by having:
+
+* a customized ``mkinitcpio`` preset generating an ``archiso.efi`` image instead of a regular initramfs
+* ``sbctl`` signing every ``.efi`` with your custom keys, including the bootloader and the ``archiso.efi``
+
+Note: currently, I only changed the systemd-boot ``uefi-x64.systemd-boot.esp`` boot mode for the ``releng`` profile.
+
+Requirements
+============
+
+Building requires ``sbctl`` installed as well as your own custom signing keys already generated and managed by ``sbctl``.
+
+Build
+=====
+
+Build the ``releng`` profile as usual, with ``mkarchiso``:
+
+.. code:: sh
+   sudo ./archiso/mkarchiso -v -w ./work/ -o ./build/ ./configs/releng
+
+Test with QEMU
+==============
+
+.. code:: sh
+   ./scripts/run_archiso.sh -d -s -u -i ./build/archlinux-2022.10.08-x86_64.iso
+
 =======
 archiso
 =======

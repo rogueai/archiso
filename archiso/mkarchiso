@@ -308,6 +308,13 @@ _make_custom_airootfs() {
     if [[ -d "${profile}/airootfs" ]]; then
         _msg_info "Copying custom airootfs files..."
         cp -af --no-preserve=ownership,mode -- "${profile}/airootfs/." "${pacstrap_dir}"
+
+        # create kernel cmdline for mkinitcpio efi image creation
+        if [[ ! -d  "${pacstrap_dir}/etc/kernel/" ]]; then
+            mkdir -p  "${pacstrap_dir}/etc/kernel/"
+        fi
+        echo "archisobasedir=${install_dir} archisolabel=${iso_label}" > "${pacstrap_dir}/etc/kernel/cmdline"
+
         # Set ownership and mode for files and directories
         for filename in "${!file_permissions[@]}"; do
             IFS=':' read -ra permissions <<< "${file_permissions["${filename}"]}"
@@ -761,13 +768,20 @@ _make_bootmode_uefi-x64.systemd-boot.esp() {
                     "${profile}/efiboot/"
                     "${pacstrap_dir}/boot/vmlinuz-"*
                     "${pacstrap_dir}/boot/initramfs-"*".img"
+                    "${pacstrap_dir}/boot/archiso.efi"
                     "${_available_ucodes[@]}")
     efiboot_imgsize="$(du -bcs -- "${efiboot_files[@]}" \
         2>/dev/null | awk 'END { print $1 }')"
     # Create a FAT image for the EFI system partition
     _make_efibootimg "$efiboot_imgsize"
 
+    # Copy archiso EFI binary to the boot path
+    sbctl sign "${pacstrap_dir}/boot/archiso.efi"
+    mcopy -i "${efibootimg}" \
+        "${pacstrap_dir}/boot/archiso.efi" ::/EFI/BOOT/archiso.efi
+
     # Copy systemd-boot EFI binary to the default/fallback boot path
+    sbctl sign "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi"
     mcopy -i "${efibootimg}" \
         "${pacstrap_dir}/usr/lib/systemd/boot/efi/systemd-bootx64.efi" ::/EFI/BOOT/BOOTx64.EFI
 

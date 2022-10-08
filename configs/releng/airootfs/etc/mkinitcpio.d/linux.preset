@@ -6,3 +6,4 @@ ALL_kver='/boot/vmlinuz-linux'
 ALL_config='/etc/mkinitcpio.conf'
 
 archiso_image="/boot/initramfs-linux.img"
+archiso_efi_image=/boot/archiso.efi
